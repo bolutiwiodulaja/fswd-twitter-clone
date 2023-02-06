@@ -1,11 +1,12 @@
 import React from 'react';
+import { safeCredentials } from './utils/fetchHelper';
 
 class Profile extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      postTweet: "",
+      newTweet: "",
       username: "",
       tweets: []
     }
@@ -17,7 +18,7 @@ class Profile extends React.Component {
     .then((response) => {return response.json()})
     .then((data) => {
       this.setState({
-          postTweet: data.postTweet,
+          newTweet: data.newTweet,
           username: data.username,
           tweets: data.tweets
       })
@@ -30,11 +31,17 @@ class Profile extends React.Component {
     this.setState({[e.target.name]: e.target.value});
   }
   
-  postTweet = () => {
-    fetch( {
+  postTweet = (e) => {
+    e.preventDefault();
+
+    fetch('/api/tweets', safeCredentials({
       method: 'POST',
-      body: JSON.stringify({tweet: this.state})
-    })
+      body: JSON.stringify({
+        tweet: {
+          message: this.state.newTweet
+        }
+      })
+    }))
     .then(data => {
       this.setState({
         tweets: [data.tweet, ...this.state.tweets]
@@ -46,7 +53,7 @@ class Profile extends React.Component {
   }
   
   render() {
-    const { username, postTweet, tweets } = this.state;
+    const { username, newTweet, tweets } = this.state;
     return (
       <React.Fragment>
               <div>
@@ -59,7 +66,7 @@ class Profile extends React.Component {
 
               <div>
                   <form onSubmit={this.postTweet}>
-                    <input className="userTweet" type="text" name="tweet" placeholder="Write Tweet Here" value={ postTweet } onChange={this.changeHandler} />
+                    <input className="userTweet" type="text" name="newTweet" placeholder="Write Tweet Here" value={ newTweet } onChange={this.changeHandler} />
                     <button className="register" type="submit">Post Tweet</button>
                   </form>
               </div>

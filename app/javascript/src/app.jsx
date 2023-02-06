@@ -8,7 +8,6 @@ const App= (props) => {
   return (
     <Home></Home>,
     <Profile></Profile>
-
   );
 }
 
