@@ -1,18 +1,17 @@
 module Api
   class TweetsController < ApplicationController
+    skip_before_action :verify_authenticity_token
+
     def index
       @tweets = Tweet.all.order(created_at: :desc)
       render 'api/tweets/index'
     end
 
     def create
-      token = cookies.signed[:twitter_session_token]
-      session = Session.find_by(token: token)
-      user = session.user
-      @tweet = user.tweets.new(tweet_params)
+      @tweet = Tweet.new(tweet_params)
 
-      if @tweet.save
-        TweetMailer.notify(@tweet).deliver!
+      if @tweet.save!
+        # TweetMailer.notify(@tweet).deliver!
         render 'api/tweets/create'
       end
     end
